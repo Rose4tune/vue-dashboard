@@ -98,17 +98,96 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useTodos } from '../composables/useTodos';
-
-const { todos, loading, error, fetchTodos, createTodo, updateTodo, deleteTodo } = useTodos();
+import { ref } from 'vue';
+import type { Todo } from '~/types';
+// Nuxt composables 명시적 import (Vetur/TypeScript 오류 방지)
+import { useAsyncData, refreshNuxtData, useNuxtApp } from '#app';
 
 const newTodoText = ref("");
 
-// Fetch todos on mount
-onMounted(async () => {
-  await fetchTodos();
-});
+// useAsyncData를 사용하여 SSR과 클라이언트 모두에서 데이터 로드
+const { data: todos, error, pending: loading } = await useAsyncData<Todo[]>(
+  'todos',
+  async () => {
+    const { $supabase } = useNuxtApp();
+    const { data, error: fetchError } = await $supabase
+      .from("todos")
+      .select("*")
+      .order("order", { ascending: true });
+
+    if (fetchError) {
+      throw new Error(fetchError.message);
+    }
+
+    return data || [];
+  },
+  {
+    default: () => []
+  }
+);
+
+const fetchTodos = async () => {
+  await refreshNuxtData('todos');
+};
+
+const createTodo = async (input: { text: string; done: boolean; order: number }) => {
+  try {
+    const { $supabase } = useNuxtApp();
+    const { data, error } = await $supabase
+      .from("todos")
+      .insert([input])
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    await fetchTodos();
+    return data;
+  } catch (err) {
+    console.error("Error creating todo:", err);
+    throw err;
+  }
+};
+
+const updateTodo = async (id: string, updates: any) => {
+  try {
+    const { $supabase } = useNuxtApp();
+    const { data, error } = await $supabase
+      .from("todos")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    await fetchTodos();
+    return data;
+  } catch (err) {
+    console.error("Error updating todo:", err);
+    throw err;
+  }
+};
+
+const deleteTodo = async (id: string) => {
+  try {
+    const { $supabase } = useNuxtApp();
+    const { error } = await $supabase.from("todos").delete().eq("id", id);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    await fetchTodos();
+  } catch (err) {
+    console.error("Error deleting todo:", err);
+    throw err;
+  }
+};
 
 const addTodo = async () => {
   if (!newTodoText.value.trim()) return;
