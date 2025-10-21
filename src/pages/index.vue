@@ -20,15 +20,8 @@
       <!-- Weather Widget -->
       <WeatherWidget />
 
-      <!-- Quote Widget Placeholder -->
-      <div class="widget-card">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          랜덤 명언
-        </h2>
-        <div class="text-center py-8">
-          <p class="text-gray-500">명언 위젯 준비 중...</p>
-        </div>
-      </div>
+      <!-- Quote Widget -->
+      <QuoteWidget />
 
       <!-- Todo Widget -->
       <div class="lg:col-span-2">

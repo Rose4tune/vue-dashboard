@@ -33,11 +33,13 @@ export interface WeatherResponse {
 export interface Quote {
   message: string;
   author?: string;
+  authorProfile?: string;
 }
 
 export interface QuoteResponse {
   message: string;
   author?: string;
+  authorProfile?: string;
 }
 
 // Todo Types
