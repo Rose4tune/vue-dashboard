@@ -43,7 +43,6 @@ React 개발자가 Vue 생태계를 학습하고 실무 역량을 보여주기 �
 - **Language**: [TypeScript](https://www.typescriptlang.org/) (v5.6.3)
 - **State Management**: [Pinia](https://pinia.vuejs.org/) (v3.0.3)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) (v4.0.0)
-- **HTTP Client**: [Axios](https://axios-http.com/) (v1.12.2)
 
 ### Backend & APIs
 
@@ -66,18 +65,13 @@ vue-dashboard/
 │   ├── assets/
 │   │   └── styles.css          # 전역 스타일 & Tailwind 설정
 │   ├── components/
-│   │   ├── WeatherWidget.vue   # 날씨 위젯 컴포넌트
-│   │   ├── QuoteWidget.vue     # 명언 위젯 컴포넌트
-│   │   └── TodoWidget.vue      # 할 일 위젯 컴포넌트
+│   │   ├── WeatherWidget.vue   # 날씨 위젯 (useAsyncData 사용)
+│   │   ├── QuoteWidget.vue     # 명언 위젯 (useAsyncData 사용)
+│   │   └── TodoWidget.vue      # Todo 위젯 (Store + Composable 사용)
 │   ├── composables/
-│   │   ├── useWeather.ts       # 날씨 로직 (향후 활용)
-│   │   ├── useQuote.ts         # 명언 로직 (향후 활용)
-│   │   ├── useTodos.ts         # Todo 로직 (향후 활용)
-│   │   └── useSupabase.ts      # Supabase 클라이언트
+│   │   └── useTodos.ts         # Todo Composable (Store wrapper)
 │   ├── stores/
-│   │   ├── weatherStore.ts     # 날씨 상태 관리
-│   │   ├── quoteStore.ts       # 명언 상태 관리
-│   │   └── todoStore.ts        # Todo 상태 관리
+│   │   └── todoStore.ts        # Todo 상태 관리 (Pinia)
 │   ├── plugins/
 │   │   └── supabase.ts         # Supabase 플러그인
 │   ├── pages/
@@ -231,7 +225,51 @@ export default defineNuxtPlugin(() => {
 });
 ```
 
-### 5. 반응형 디자인
+### 5. 하이브리드 아키텍처 접근
+
+프로젝트의 특성에 맞게 **상황별로 최적의 패턴**을 선택했습니다.
+
+#### Weather & Quote 위젯: `useAsyncData` 패턴
+
+```typescript
+// SSR 최적화가 중요한 단순 API 호출
+const { data: weather, error, pending } = await useAsyncData('weather',
+  async () => await fetchWeatherData()
+);
+```
+
+**선택 이유:**
+
+- SSR/SSG 지원으로 초기 로딩 성능 향상
+- 단순한 API 호출 (복잡한 상태 관리 불필요)
+- SEO 최적화
+
+#### Todo 위젯: Store + Composable 패턴
+
+```typescript
+// Component
+const { todos, loading, createTodo, toggleTodo, deleteTodo } = useTodos();
+
+// Composable (useTodos.ts)
+const store = useTodoStore();
+return { ...storeToRefs(store), ...store };
+
+// Store (todoStore.ts)
+const createTodo = async (input) => {
+  // 비즈니스 로직 처리
+  await $supabase.from('todos').insert([input]);
+  await fetchTodos();
+};
+```
+
+**선택 이유:**
+
+- 복잡한 CRUD 로직의 분리 및 재사용
+- 클라이언트 중심의 상태 관리
+
+이러한 **하이브리드 접근**을 통해 "모든 곳에 같은 패턴을 강제"하는 것보다 **각 상황에 맞는 최적의 도구를 선택**하는 실용적 판단을 보여줍니다.
+
+### 6. 반응형 디자인
 
 Tailwind CSS의 유틸리티 클래스를 활용한 반응형 그리드 레이아웃:
 
@@ -254,12 +292,19 @@ Tailwind CSS의 유틸리티 클래스를 활용한 반응형 그리드 레이�
 - **라이프사이클**: `watch/watchEffect`, 의존성 자동 추적 (리액트의 `useEffect` 개념)
 - **상태 관리**: Pinia, 더 간결한 API (Redux/Zustand 개념)
 
-### Nuxt 3의 강점
+### Nuxt 3의 강점 발견
 
 - **자동 Import**: 컴포넌트와 composables 자동 인식으로 import 문 불필요
 - **파일 기반 라우팅**: `pages/` 폴더 기반의 직관적인 라우팅
 - **SSR/SSG**: SEO 최적화와 초기 로딩 성능 향상
 - **useAsyncData**: 서버/클라이언트 데이터 페칭 통합 관리
+
+### 아키텍처 설계 경험
+
+- **하이브리드 패턴**: 상황에 맞는 최적의 도구 선택의 중요성 학습
+- **트레이드오프 이해**: SSR vs 클라이언트 상태 관리의 장단점 비교
+- **실용주의**: 일관성보다 각 기능의 요구사항에 맞는 패턴 적용
+- **확장성 고려**: 미래의 기능 추가를 염두에 둔 구조 설계
 
 <!--
 ### TypeScript 활용
@@ -282,20 +327,44 @@ Tailwind CSS의 유틸리티 클래스를 활용한 반응형 그리드 레이�
 - [ ] **접근성 개선**: ARIA 속성, 키보드 네비게이션 강화
 -->
 
-## 📊 아키텍처 개선 사항
+## 📊 아키텍처 설계
 
-현재 컴포넌트에서 직접 API를 호출하고 있지만, 향후 다음과 같이 개선할 계획입니다:
+이 프로젝트는 **하이브리드 아키텍처**를 채택하여 각 기능의 특성에 맞는 최적의 패턴을 적용했습니다.
+
+### 현재 아키텍처
 
 ```
-컴포넌트 → Composables → Store → API
+Weather/Quote Widget (SSR 중심)
+    ↓
+useAsyncData (Nuxt)
+    ↓
+External APIs
+
+─────────────────────────
+
+Todo Widget (클라이언트 상태 관리)
+    ↓
+useTodos Composable
+    ↓
+todoStore (Pinia)
+    ↓
+Supabase API
 ```
 
-이를 통해:
+### 장점
 
-- 로직 재사용성 향상
-- 테스트 용이성 증가
-- 관심사의 분리
-- 유지보수성 개선
+✅ **유연성**: 각 기능의 요구사항에 맞는 최적의 패턴 사용  
+✅ **성능**: SSR이 필요한 곳은 useAsyncData, 복잡한 상태는 Store 활용  
+✅ **유지보수성**: 관심사의 분리로 코드 관리 용이  
+✅ **확장성**: 새로운 기능 추가 시 적절한 패턴 선택 가능  
+✅ **학습**: Vue/Nuxt 생태계의 다양한 패턴 경험
+
+### 설계 원칙
+
+> "모든 문제를 하나의 패턴으로 해결하려 하지 말고,  
+> 각 문제의 특성에 맞는 최적의 도구를 선택하라"
+
+이 원칙을 통해 실용적이고 확장 가능한 아키텍처를 구축했습니다.
 
 ## 🤝 기여하기
 
