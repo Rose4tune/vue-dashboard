@@ -102,12 +102,9 @@
 </template>
 
 <script setup lang="ts">
-// Nuxt composables 명시적 import (Vetur/TypeScript 오류 방지)
-import { useRuntimeConfig, useAsyncData, refreshNuxtData } from '#app';
 
 const config = useRuntimeConfig();
 
-// useAsyncData를 사용하여 SSR과 클라이언트 모두에서 데이터 로드
 const { data: weather, error, pending: loading } = await useAsyncData(
   'weather',
   async () => {
@@ -140,7 +137,6 @@ const { data: weather, error, pending: loading } = await useAsyncData(
 );
 
 const fetchWeather = async () => {
-  // 재시도 함수 (에러 발생 시 사용)
   await refreshNuxtData('weather');
 };
 </script>

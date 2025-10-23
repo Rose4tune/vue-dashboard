@@ -11,7 +11,6 @@ export const useQuoteStore = defineStore("quote", () => {
     error.value = null;
 
     try {
-      // 한국어 명언 API 사용
       const response = await fetch(
         "https://korean-advice-open-api.vercel.app/api/advice"
       );

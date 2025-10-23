@@ -100,12 +100,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import type { Todo } from '~/types';
-// Nuxt composables 명시적 import (Vetur/TypeScript 오류 방지)
-import { useAsyncData, refreshNuxtData, useNuxtApp } from '#app';
 
 const newTodoText = ref("");
-
-// useAsyncData를 사용하여 SSR과 클라이언트 모두에서 데이터 로드
 const { data: todos, error, pending: loading } = await useAsyncData<Todo[]>(
   'todos',
   async () => {
