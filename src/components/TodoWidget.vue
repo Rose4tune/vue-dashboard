@@ -39,7 +39,7 @@
           :id="`todo-${todo.id}`"
           type="checkbox"
           :checked="todo.done"
-          @change="toggleTodo(todo)"
+          @change="handleToggleTodo(todo)"
           class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
         />
         <label
@@ -54,7 +54,7 @@
           {{ todo.text }}
         </label>
         <button
-          @click="removeTodo(todo.id)"
+          @click="handleRemoveTodo(todo.id)"
           class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
           title="삭제"
         >
@@ -77,7 +77,7 @@
 
     <!-- Add Todo Form -->
     <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-      <form @submit.prevent="addTodo" class="flex space-x-2">
+      <form @submit.prevent="handleAddTodo" class="flex space-x-2">
         <input
           v-model="newTodoText"
           type="text"
@@ -98,94 +98,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { Todo } from '~/types';
+import type { Todo } from "~/types";
+
+const { todos, loading, error, fetchTodos, createTodo, toggleTodo, deleteTodo } = useTodos();
 
 const newTodoText = ref("");
-const { data: todos, error, pending: loading } = await useAsyncData<Todo[]>(
-  'todos',
-  async () => {
-    const { $supabase } = useNuxtApp();
-    const { data, error: fetchError } = await $supabase
-      .from("todos")
-      .select("*")
-      .order("order", { ascending: true });
 
-    if (fetchError) {
-      throw new Error(fetchError.message);
-    }
+onMounted(async () => {
+  await fetchTodos();
+});
 
-    return data || [];
-  },
-  {
-    default: () => []
-  }
-);
-
-const fetchTodos = async () => {
-  await refreshNuxtData('todos');
-};
-
-const createTodo = async (input: { text: string; done: boolean; order: number }) => {
-  try {
-    const { $supabase } = useNuxtApp();
-    const { data, error } = await $supabase
-      .from("todos")
-      .insert([input])
-      .select()
-      .single();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    await fetchTodos();
-    return data;
-  } catch (err) {
-    console.error("Error creating todo:", err);
-    throw err;
-  }
-};
-
-const updateTodo = async (id: string, updates: any) => {
-  try {
-    const { $supabase } = useNuxtApp();
-    const { data, error } = await $supabase
-      .from("todos")
-      .update(updates)
-      .eq("id", id)
-      .select()
-      .single();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    await fetchTodos();
-    return data;
-  } catch (err) {
-    console.error("Error updating todo:", err);
-    throw err;
-  }
-};
-
-const deleteTodo = async (id: string) => {
-  try {
-    const { $supabase } = useNuxtApp();
-    const { error } = await $supabase.from("todos").delete().eq("id", id);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    await fetchTodos();
-  } catch (err) {
-    console.error("Error deleting todo:", err);
-    throw err;
-  }
-};
-
-const addTodo = async () => {
+const handleAddTodo = async () => {
   if (!newTodoText.value.trim()) return;
 
   try {
@@ -200,15 +123,15 @@ const addTodo = async () => {
   }
 };
 
-const toggleTodo = async (todo: any) => {
+const handleToggleTodo = async (todo: Todo) => {
   try {
-    await updateTodo(todo.id, { done: !todo.done });
+    await toggleTodo(todo);
   } catch (err) {
     console.error("Failed to toggle todo:", err);
   }
 };
 
-const removeTodo = async (id: string) => {
+const handleRemoveTodo = async (id: string) => {
   try {
     await deleteTodo(id);
   } catch (err) {
