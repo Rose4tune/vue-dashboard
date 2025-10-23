@@ -1,6 +1,8 @@
 # 🎯 Vue Dashboard
 
-Vue.js/Nuxt 3를 활용한 개인 대시보드 애플리케이션입니다. 날씨 정보, 오늘의 명언, 할 일 관리 기능을 제공하며, React 개발자가 Vue 생태계를 학습하고 실무 역량을 보여주기 위한 포트폴리오 프로젝트입니다.
+Vue.js/Nuxt 3를 활용한 개인 대시보드 애플리케이션입니다.<br/>
+날씨 정보, 오늘의 명언, 할 일 관리 기능을 제공하며,<br/>
+React 개발자가 Vue 생태계를 학습하고 실무 역량을 보여주기 위한 포트폴리오 프로젝트입니다.
 
 ![Vue](https://img.shields.io/badge/Vue.js-3.5-4FC08D?style=flat-square&logo=vue.js&logoColor=white)
 ![Nuxt](https://img.shields.io/badge/Nuxt-4.1-00DC82?style=flat-square&logo=nuxt.js&logoColor=white)
@@ -13,7 +15,6 @@ Vue.js/Nuxt 3를 활용한 개인 대시보드 애플리케이션입니다. 날�
 
 - OpenWeatherMap API를 활용한 실시간 날씨 정보
 - 온도, 체감온도, 습도, 풍속 등 상세 정보 제공
-- 날씨 아이콘 및 설명 (한국어 지원)
 - 서울 지역 기준 (위도/경도 커스터마이징 가능)
 
 ### 💭 명언 위젯
@@ -21,7 +22,6 @@ Vue.js/Nuxt 3를 활용한 개인 대시보드 애플리케이션입니다. 날�
 - 한국어 명언 API 연동
 - 작가 및 작가 프로필 정보 표시
 - 버튼 클릭으로 새로운 명언 불러오기
-- 우아한 인용구 디자인
 
 ### ✅ 할 일 관리 (Todo)
 
@@ -33,10 +33,6 @@ Vue.js/Nuxt 3를 활용한 개인 대시보드 애플리케이션입니다. 날�
 ### 🎨 UI/UX
 
 - 반응형 디자인 (모바일/태블릿/데스크톱)
-- 다크모드 지원
-- 부드러운 애니메이션 및 트랜지션
-- 로딩 및 에러 상태 처리
-- 재시도 기능
 
 ## 🛠️ 기술 스택
 
@@ -235,13 +231,7 @@ export default defineNuxtPlugin(() => {
 });
 ```
 
-### 5. 에러 처리 및 사용자 경험
-
-- 로딩 상태 표시
-- 에러 발생 시 재시도 버튼 제공
-- 빈 상태(Empty State) 처리
-
-### 6. 반응형 디자인
+### 5. 반응형 디자인
 
 Tailwind CSS의 유틸리티 클래스를 활용한 반응형 그리드 레이아웃:
 
@@ -257,12 +247,12 @@ Tailwind CSS의 유틸리티 클래스를 활용한 반응형 그리드 레이�
 
 ## 🎓 프로젝트를 통해 학습한 내용
 
-### React → Vue 전환 경험
+### Vue 사용 경험
 
-- **템플릿 문법**: JSX에서 Vue 템플릿 디렉티브로 전환 (`v-if`, `v-for`, `v-model`)
-- **반응성 시스템**: `useState` → `ref/reactive`, `.value` 접근 방식 이해
-- **라이프사이클**: `useEffect` → `watch/watchEffect`, 의존성 자동 추적
-- **상태 관리**: Redux/Zustand → Pinia, 더 간결한 API
+- **템플릿 문법**: Vue 템플릿 디렉티브 이해 (`v-if`, `v-for`, `v-model`)
+- **반응성 시스템**: `ref/reactive`, `.value` 접근 방식 이해 (리액트의 `useState` 개념)
+- **라이프사이클**: `watch/watchEffect`, 의존성 자동 추적 (리액트의 `useEffect` 개념)
+- **상태 관리**: Pinia, 더 간결한 API (Redux/Zustand 개념)
 
 ### Nuxt 3의 강점
 
@@ -271,6 +261,7 @@ Tailwind CSS의 유틸리티 클래스를 활용한 반응형 그리드 레이�
 - **SSR/SSG**: SEO 최적화와 초기 로딩 성능 향상
 - **useAsyncData**: 서버/클라이언트 데이터 페칭 통합 관리
 
+<!--
 ### TypeScript 활용
 
 - Vue 3의 향상된 TypeScript 지원 체험
@@ -289,6 +280,7 @@ Tailwind CSS의 유틸리티 클래스를 활용한 반응형 그리드 레이�
 - [ ] **커스터마이징**: 위젯 show/hide, 테마 변경 기능
 - [ ] **성능 최적화**: 이미지 최적화, 코드 스플리팅
 - [ ] **접근성 개선**: ARIA 속성, 키보드 네비게이션 강화
+-->
 
 ## 📊 아키텍처 개선 사항
 
@@ -312,14 +304,6 @@ Tailwind CSS의 유틸리티 클래스를 활용한 반응형 그리드 레이�
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## 📝 라이선스
-
-이 프로젝트는 MIT 라이선스를 따릅니다.
-
-## 📧 연락처
-
-프로젝트 관련 문의: [GitHub Issues](https://github.com/YOUR_USERNAME/vue-dashboard/issues)
 
 ## 🙏 감사의 말
 
